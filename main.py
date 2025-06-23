@@ -1,4 +1,4 @@
-# -------------------------------- tunMac.py -------------------------------#
+# -------------------------------- main.py -------------------------------- #
 # This script is designed to determine the users platform and import the    #
 # appropriate TUN/TAP adapter module based on the platform. It then runs    #
 # the main function of the imported module by calling 'tun.run()'.          #
@@ -6,7 +6,7 @@
 # Requires Python 3.10 or higher to run.                                    #
 #                                                                           #
 # This script is part of the PhaethonVPN project.          v0.0.1           #
-# --------------------------------- s3B-a ----------------------------------#
+# --------------------------------- s3B-a --------------------------------- #
 
 import sys
 import os
