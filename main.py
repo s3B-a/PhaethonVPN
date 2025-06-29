@@ -5,12 +5,12 @@
 #                                                                           #
 # Requires Python 3.10 or higher to run.                                    #
 #                                                                           #
-# This script is part of the PhaethonVPN project.          v0.0.1           #
+# This script is part of the PhaethonVPN project.          v0.0.2           #
 # --------------------------------- s3B-a --------------------------------- #
 
-import sys
-import os
 import ctypes
+import os
+import sys
 
 def main():
     platform = sys.platform
