@@ -1,11 +1,16 @@
 # ----------------------------- tunWindows.py ----------------------------- #
+# ----------------------------- tunWindows.py ----------------------------- #
 # This script is designed to create a wintun adapter, start a session,      #
 # read and send packets using the Wintun library, handle the Wintun driver  #
 # and manage the adapter lifecycle on a Windows system.                     #
 #                                                                           #
 # This script is part of the PhaethonVPN project.          v0.0.2           #
 # --------------------------------- s3B-a --------------------------------- #
+# This script is part of the PhaethonVPN project.          v0.0.2           #
+# --------------------------------- s3B-a --------------------------------- #
 
+import adapterscan as adaptScan
+import bridges
 import adapterscan as adaptScan
 import bridges
 import ctypes
@@ -18,15 +23,18 @@ import threading
 import os
 import uuid
 import wintunLoader
+import wintunLoader
 
 INFINITE = 0xFFFFFFFF
 
+wintun = wintunLoader.get_wintun()
 wintun = wintunLoader.get_wintun()
 
 # Converts a string of a GUID into the GUID structure
 def string_to_guid(s):
     u = uuid.UUID(s)
     d = u.bytes_le
+    return wintun.GUID(
     return wintun.GUID(
         Data1=int.from_bytes(d[0:4], 'little'),
         Data2=int.from_bytes(d[4:6], 'little'),
@@ -38,19 +46,27 @@ def string_to_guid(s):
 # Returns a session handle if successful, otherwise None
 def startWintunSession(adapter, mtu):
     print(f"Starting Wintun session with MTU {mtu}")
+    print(f"Starting Wintun session with MTU {mtu}")
     session = wintun.WintunStartSession(adapter, mtu)
     if not session:
+        print("Failed to start session. Adapter handle:", adapter)
         print("Failed to start session. Adapter handle:", adapter)
         return None
     return session
 
 # Reads packets from the Wintun session
 def readPackets(session, sock, server_ip, server_port, stop_event):
+def readPackets(session, sock, server_ip, server_port, stop_event):
     read_event = wintun.WintunGetReadWaitEvent(session)
     if not read_event:
         print("Failed to get read wait event.")
         return
 
+    while not stop_event.is_set():
+        result = ctypes.windll.kernel32.WaitForSingleObject(read_event, 1000)  # 1s timeout to check stop_event
+        if result == 0:
+            packet_size = wintypes.DWORD(0)
+            packet = wintun.WintunReceivePacket(session, ctypes.byref(packet_size))
     while not stop_event.is_set():
         result = ctypes.windll.kernel32.WaitForSingleObject(read_event, 1000)  # 1s timeout to check stop_event
         if result == 0:
@@ -67,7 +83,18 @@ def readPackets(session, sock, server_ip, server_port, stop_event):
                     time.sleep(0.01)
                 except Exception as e:
                     print(f"Send error: {e}")
+            if packet:
+                packet_bytes = ctypes.string_at(packet, packet_size.value)
+                wintun.WintunReleaseReceivePacket(session, packet)
+
+                # Send
+                try:
+                    sock.sendto(packet_bytes, (server_ip, server_port))
+                    time.sleep(0.01)
+                except Exception as e:
+                    print(f"Send error: {e}")
         else:
+            continue
             continue
 
 # Closes the Wintun adapter and any resources associated with it
@@ -78,6 +105,34 @@ def closeAdapter(adapter):
     else:
         print("No adapter to close.")
 
+# Receives packets from the server and injects them into the Wintun session
+def receiveFromServerAndInject(sock, session, stop_event):
+    while not stop_event.is_set():
+        try:
+            data, _ = sock.recvfrom(65535)
+            if data:
+                packet = wintun.WintunAllocateSendPacket(session, len(data))
+                print(f"Received {len(data)} bytes from server, injecting into Wintun session.")
+                if packet:
+                    ctypes.memmove(packet, data, len(data))
+                    wintun.WintunSendPacket(session, packet)
+        except socket.timeout:
+            continue
+        except Exception as e:
+            print(f"Receive error: {e}")
+            break
+
+# This helper function runs the packet reader
+def packetReader(session, sock, server_ip, server_port, stop_event):
+    while not stop_event.is_set():
+        readPackets(session, sock, server_ip, server_port, stop_event)
+
+# This helper function runs the packet injector
+def packetInjector(sock, session, stop_event):
+    while not stop_event.is_set():
+        receiveFromServerAndInject(sock, session, stop_event)
+
+# This function initializes the Wintun library, creates an adapter, and starts a session
 # Receives packets from the server and injects them into the Wintun session
 def receiveFromServerAndInject(sock, session, stop_event):
     while not stop_event.is_set():
@@ -211,6 +266,12 @@ def run():
     
     input("press enter to close the adapter and exit...")
     closeAdapter(adapter)
+
+# This function allows the user to choose what country to connect to
+def chooseNetwork():
+    bridges.loadDictionary()
+    return bridges.returnIP()
+
 
 # This function allows the user to choose what country to connect to
 def chooseNetwork():
