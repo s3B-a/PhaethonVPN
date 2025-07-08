@@ -35,7 +35,6 @@ def string_to_guid(s):
     u = uuid.UUID(s)
     d = u.bytes_le
     return wintun.GUID(
-    return wintun.GUID(
         Data1=int.from_bytes(d[0:4], 'little'),
         Data2=int.from_bytes(d[4:6], 'little'),
         Data3=int.from_bytes(d[6:8], 'little'),
@@ -55,7 +54,6 @@ def startWintunSession(adapter, mtu):
     return session
 
 # Reads packets from the Wintun session
-def readPackets(session, sock, server_ip, server_port, stop_event):
 def readPackets(session, sock, server_ip, server_port, stop_event):
     read_event = wintun.WintunGetReadWaitEvent(session)
     if not read_event:
