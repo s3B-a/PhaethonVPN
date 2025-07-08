@@ -11,8 +11,6 @@
 
 import adapterscan as adaptScan
 import bridges
-import adapterscan as adaptScan
-import bridges
 import ctypes
 import ctypes.wintypes as wintypes
 from multiprocessing import Event
@@ -23,11 +21,9 @@ import threading
 import os
 import uuid
 import wintunLoader
-import wintunLoader
 
 INFINITE = 0xFFFFFFFF
 
-wintun = wintunLoader.get_wintun()
 wintun = wintunLoader.get_wintun()
 
 # Converts a string of a GUID into the GUID structure
@@ -45,10 +41,8 @@ def string_to_guid(s):
 # Returns a session handle if successful, otherwise None
 def startWintunSession(adapter, mtu):
     print(f"Starting Wintun session with MTU {mtu}")
-    print(f"Starting Wintun session with MTU {mtu}")
     session = wintun.WintunStartSession(adapter, mtu)
     if not session:
-        print("Failed to start session. Adapter handle:", adapter)
         print("Failed to start session. Adapter handle:", adapter)
         return None
     return session
@@ -65,11 +59,6 @@ def readPackets(session, sock, server_ip, server_port, stop_event):
         if result == 0:
             packet_size = wintypes.DWORD(0)
             packet = wintun.WintunReceivePacket(session, ctypes.byref(packet_size))
-    while not stop_event.is_set():
-        result = ctypes.windll.kernel32.WaitForSingleObject(read_event, 1000)  # 1s timeout to check stop_event
-        if result == 0:
-            packet_size = wintypes.DWORD(0)
-            packet = wintun.WintunReceivePacket(session, ctypes.byref(packet_size))
             print(f"Received packet of size {packet_size.value} bytes.")
             if packet:
                 packet_bytes = ctypes.string_at(packet, packet_size.value)
@@ -81,18 +70,7 @@ def readPackets(session, sock, server_ip, server_port, stop_event):
                     time.sleep(0.01)
                 except Exception as e:
                     print(f"Send error: {e}")
-            if packet:
-                packet_bytes = ctypes.string_at(packet, packet_size.value)
-                wintun.WintunReleaseReceivePacket(session, packet)
-
-                # Send
-                try:
-                    sock.sendto(packet_bytes, (server_ip, server_port))
-                    time.sleep(0.01)
-                except Exception as e:
-                    print(f"Send error: {e}")
         else:
-            continue
             continue
 
 # Closes the Wintun adapter and any resources associated with it
