@@ -1,11 +1,8 @@
 # ----------------------------- tunWindows.py ----------------------------- #
-# ----------------------------- tunWindows.py ----------------------------- #
 # This script is designed to create a wintun adapter, start a session,      #
 # read and send packets using the Wintun library, handle the Wintun driver  #
 # and manage the adapter lifecycle on a Windows system.                     #
 #                                                                           #
-# This script is part of the PhaethonVPN project.          v0.0.2           #
-# --------------------------------- s3B-a --------------------------------- #
 # This script is part of the PhaethonVPN project.          v0.0.2           #
 # --------------------------------- s3B-a --------------------------------- #
 
@@ -242,12 +239,6 @@ def run():
     
     input("press enter to close the adapter and exit...")
     closeAdapter(adapter)
-
-# This function allows the user to choose what country to connect to
-def chooseNetwork():
-    bridges.loadDictionary()
-    return bridges.returnIP()
-
 
 # This function allows the user to choose what country to connect to
 def chooseNetwork():

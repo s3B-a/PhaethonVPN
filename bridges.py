@@ -82,6 +82,7 @@ def loadDictionary():
 
 # Returns the IP address of the fastest and most reliable relay for a given country code
 def returnIP():
+    fastest = None
     while(True):
         print("Available countries:")
         for country in list_of_country_codes:
