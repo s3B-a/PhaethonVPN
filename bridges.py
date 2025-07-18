@@ -1,10 +1,11 @@
+#!/usr/bin/env python3
 # ------------------------------- bridges.py ------------------------------ #
 # This Script is desgined to determine all available relays through the     #
 # Tor network csv within the ./servers directory. It allows the the user to #
 # choose a country code and returns the fastest and most reliable relay for #
 # that country, where it also returns said IP address and port number.      #
 #                                                                           #
-# This script is part of the PhaethonVPN project.          v0.0.1           #
+# This script is part of the PhaethonVPN project.          v0.0.2           #
 # --------------------------------- s3B-a --------------------------------- #
 
 import concurrent.futures
@@ -82,6 +83,7 @@ def loadDictionary():
 
 # Returns the IP address of the fastest and most reliable relay for a given country code
 def returnIP():
+    fastest = None
     while(True):
         print("Available countries:")
         for country in list_of_country_codes:
