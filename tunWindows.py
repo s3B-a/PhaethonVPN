@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # ----------------------------- tunWindows.py ----------------------------- #
 # This script is designed to create a wintun adapter, start a session,      #
 # read and send packets using the Wintun library, handle the Wintun driver  #

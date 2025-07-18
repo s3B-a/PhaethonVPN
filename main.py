@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # -------------------------------- main.py -------------------------------- #
 # This script is designed to determine the users platform and import the    #
 # appropriate TUN/TAP adapter module based on the platform. It then runs    #
@@ -28,6 +29,7 @@ def main():
     
     tun.run()
 
+# Checks if the script is running with administrator privileges on Windows
 def administratorCheck():
     try:
         return ctypes.windll.shell32.IsUserAnAdmin()
@@ -37,6 +39,7 @@ def administratorCheck():
 if __name__ == "__main__":
     system = platform.system()
 
+    # Checks if the script is running as administrator prior to execution
     if system == "Windows":
         # Admin check for Windows
         if not administratorCheck():
@@ -68,7 +71,9 @@ if __name__ == "__main__":
             os.system(term_cmd)
             sys.exit()
 
+    # Checks if the script is running on a suitable Python version
     if sys.version_info < (3, 10):
         print("This script requires Python 3.10 or higher.")
         sys.exit(1)
+
     main()

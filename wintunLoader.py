@@ -1,9 +1,10 @@
+#!/usr/bin/env python3
 # ----------------------------- wintunLoader.py --------------------------- #
 # This Script is desgined to load the Wintun library dynamically based on   #
 # the CPU architecture of the system. It provides a ton of functions to     #
 # create, open, close, and manage Wintun adapters and sessions.             #
 #                                                                           #
-# This script is part of the PhaethonVPN project.          v0.0.1           #
+# This script is part of the PhaethonVPN project.          v0.0.2           #
 # --------------------------------- s3B-a --------------------------------- #
 
 import ctypes

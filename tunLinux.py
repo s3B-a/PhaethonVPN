@@ -1,20 +1,25 @@
+#!/usr/bin/env python3
 # ------------------------------- tunLinux.py ----------------------------- #
+# This script is designed to create a TUN device, start a session, read and #
+# send packets using the UNIX TUN/TAP interface, handle the TUN device,     #
+# and manage the adapter lifecycle on a Linux system.                       #
 #                                                                           #
-# This script is part of the PhaethonVPN project.          v0.0.1           #
+# This script is part of the PhaethonVPN project.          v0.0.2           #
 # --------------------------------- s3B-a --------------------------------- #
 
 import adapterscan
 import bridges
 import fcntl
+from multiprocessing import Event
 import os
 import socket
 import struct
 import subprocess
 import threading
 
-TUNSETIFF = 0x400454ca
-IFF_TUN   = 0x0001
-IFF_NO_PI = 0x1000
+TUNSETIFF = 0x400454ca # ioctl to set TUN/TAP interface flags
+IFF_TUN   = 0x0001 # TUN device
+IFF_NO_PI = 0x1000 # Do not provide packet information in the I/O operations
 
 # Creates a TUN device on a Linux system and returns the file descriptor
 def create_tun(name=''):
@@ -31,18 +36,29 @@ def configure_tun(name, ip):
 # Reads packets from the TUN session
 def readPackets(tun, sock, server_ip, server_port, stop_event):
     while not stop_event.is_set():
-        packet = os.read(tun, 4096)
-        sock.sendto(packet, (server_ip, server_port))
+        try:
+            packet = os.read(tun, 4096)
+            sock.sendto(packet, (server_ip, server_port))
+        except Exception as e:
+            if not stop_event.is_set():
+                print(f"Error reading from TUN device: {e}")
+            else:
+                print("Stopping read thread due to stop event.")
 
 # Receives packets from the server and injects them into the TUN device
 def receiveFromServerAndInject(sock, tun, stop_event):
     while not stop_event.is_set():
-        data, _ = sock.recvfrom(4096)
-        os.write(tun, data)
+        try:
+            data, _ = sock.recvfrom(4096)
+            os.write(tun, data)
+        except Exception as e:
+            print(f"Error receiving data: {e}")
 
+# This function runs the main logic of the TUN device management and packet handling
 def run():
+
+    # networking setup
     network = chooseNetwork()
-    
     tun_name = 'PhaethonVPN'
     tun_ip = adapterscan.generateNonConflictingIP(skip_first=100)
     server_ip = network[0]
@@ -53,10 +69,11 @@ def run():
     tun = create_tun(tun_name)
     configure_tun(tun_name, tun_ip)
 
+    # UDP socket for communication with the server
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.settimeout(1)
 
-    stop_event = threading.Event()
+    stop_event = Event()
 
     reader_thread = threading.Thread(target=readPackets, args=(tun, sock, server_ip, server_port, stop_event))
     injector_thread = threading.Thread(target=receiveFromServerAndInject, args=(sock, tun, stop_event))
@@ -75,6 +92,7 @@ def run():
         os.close(tun)
         sock.close()
 
+# Returns an array with the chosen network's IP and country code
 def chooseNetwork():
     bridges.loadDictionary()
     return bridges.returnIP()

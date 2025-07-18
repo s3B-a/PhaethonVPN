@@ -1,10 +1,11 @@
+#!/usr/bin/env python3
 # ----------------------------- adapterscan.py ---------------------------- #
 # This script is designed to scan the system for all network adapters,      #
 # Where we can get the IP addresses and input them into a list to prevent   #
 # duplicates, where we can then create a random IP address without          #
 # overriding the existing adapters.                                         #
 #                                                                           #
-# This script is part of the PhaethonVPN project.          v0.0.1           #
+# This script is part of the PhaethonVPN project.          v0.0.2           #
 # --------------------------------- s3B-a --------------------------------- #
 
 import psutil
