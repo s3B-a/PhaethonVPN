@@ -61,4 +61,6 @@ python main.py
 While PhaethonVPN does not log any data locally or send information to centralized servers, it uses **volunteer-run servers**, which may log activity depending on the operator. Use at your own discretion when handling sensitive data.
 
 ## 👤 About
-This project is developed and maintained by a single student passionate about open privacy tools and decentralized networking.
+This project is developed and maintained by a single student passionate about open privacy tools and decentralized networking. Buy him a coffee
+
+[![Buy Me a Coffee](https://img.shields.io/badge/Buy_Me_A_Coffee-FFDD00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/s3ba)
