@@ -22,6 +22,7 @@ import threading
 IFF_TUN = 0x0001
 IFF_NO_PI = 0x1000
 
+# Creates a TUN device on a Darwin system and returns file and name
 def create_tun(name='utun'):
     TUN_PREFIX = 'utun'
     for i in range(0, 255):
@@ -34,9 +35,11 @@ def create_tun(name='utun'):
             continue
     raise OSError("No utun interfaces available.")
 
+# Configures the utun device with the given specifications
 def configure_tun(name, ip):
     subprocess.run(['ifconfig', name, ip, ip, 'up'])
 
+# Reads packets from the TUN session
 def readPackets(tun, sock, server_ip, server_port, stop_event):
     while not stop_event.is_set():
         try:
@@ -48,6 +51,7 @@ def readPackets(tun, sock, server_ip, server_port, stop_event):
             else:
                 print("Stopping read thread due to stop event.")
 
+# Receives packets from the server and injects them into the TUN device
 def receiveFromServerAndInject(sock, tun, stop_event):
     while not stop_event.is_set():
         try:
@@ -56,8 +60,10 @@ def receiveFromServerAndInject(sock, tun, stop_event):
         except Exception as e:
             print(f"Error receiving data: {e}")
 
+# This function runs the main logic of the TUN device management and packet handling
 def run():
     
+    # networking setup
     network = chooseNetwork()
     tun_name = 'PhaethonVPN'
     tun_ip = adapterscan.generateNonConflictingIP(skip_first=100)
@@ -69,6 +75,7 @@ def run():
     tun = create_tun(tun_name)
     configure_tun(tun_name, tun_ip)
 
+    # UDP socket for communication with the server
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.settimeout(1)
 
@@ -91,6 +98,9 @@ def run():
         os.close(tun)
         sock.close()
 
+# Returns an array with the chosen network's IP and country code
+# bridges.returnIP[0] = Server IP
+# bridges.returnIP[1] = Country Code
 def chooseNetwork():
     bridges.loadDictionary()
     return bridges.returnIP()
