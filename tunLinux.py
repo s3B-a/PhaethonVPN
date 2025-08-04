@@ -93,6 +93,8 @@ def run():
         sock.close()
 
 # Returns an array with the chosen network's IP and country code
+# bridges.returnIP[0] = Server IP
+# bridges.returnIP[1] = Country Code
 def chooseNetwork():
     bridges.loadDictionary()
     return bridges.returnIP()
