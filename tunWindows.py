@@ -242,8 +242,6 @@ def run():
     closeAdapter(adapter)
 
 # This function allows the user to choose what country to connect to
-# bridges.returnIP[0] = Choosen Server IP address
-# bridges.returnIP[1] = Choosen Server Country Code
 def chooseNetwork():
     bridges.loadDictionary()
     return bridges.returnIP()
