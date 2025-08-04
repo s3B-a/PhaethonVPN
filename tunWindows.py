@@ -181,6 +181,7 @@ def run():
         "route", "add", "0.0.0.0", "mask", "0.0.0.0", random_ip
     ])
 
+    # network setup
     choosenNetwork = chooseNetwork()
     server_ip = choosenNetwork[0]
     print("\nThe IP is: ", server_ip)
@@ -242,6 +243,8 @@ def run():
     closeAdapter(adapter)
 
 # This function allows the user to choose what country to connect to
+# bridges.returnIP[0] = Server IP
+# bridges.returnIP[1] = Country Code
 def chooseNetwork():
     bridges.loadDictionary()
     return bridges.returnIP()
