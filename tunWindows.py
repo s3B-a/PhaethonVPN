@@ -11,6 +11,7 @@ import adapterscan as adaptScan
 import bridges
 import ctypes
 import ctypes.wintypes as wintypes
+import dnsresolve as dns
 from multiprocessing import Event
 import socket
 import subprocess
@@ -183,10 +184,10 @@ def run():
 
     # network setup
     choosenNetwork = chooseNetwork()
-    server_ip = choosenNetwork[0]
-    print("\nThe IP is: ", server_ip)
+    vpn_server_ip = choosenNetwork[0]
+    print("\nThe IP is: ", vpn_server_ip)
     server_country = choosenNetwork[1]
-    server_port = int(bridges.returnPort(server_country, server_ip))
+    server_port = int(bridges.returnPort(server_country, vpn_server_ip))
 
     # UDP socket for communication with the server
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -208,7 +209,7 @@ def run():
 
             reader_thread = threading.Thread(
                 target=readPackets,
-                args=(session, sock, server_ip, server_port, stop_event),
+                args=(session, sock, vpn_server_ip, server_port, stop_event),
                 daemon=True
             )
             injector_thread = threading.Thread(

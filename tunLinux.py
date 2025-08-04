@@ -4,11 +4,12 @@
 # send packets using the UNIX TUN/TAP interface, handle the TUN device,     #
 # and manage the adapter lifecycle on a Linux system.                       #
 #                                                                           #
-# This script is part of the PhaethonVPN project.          v0.0.2           #
+# This script is part of the PhaethonVPN project.          v0.0.3           #
 # --------------------------------- s3B-a --------------------------------- #
 
 import adapterscan
 import bridges
+import dnsresolve as dns
 import fcntl
 from multiprocessing import Event
 import os
